@@ -7,7 +7,7 @@ import SendIcon from '@mui/icons-material/Send';
 import IconButton from '@mui/material/IconButton';
 import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
-import { KeyboardEventHandler, MouseEventHandler, useRef, useState } from 'react';
+import { KeyboardEventHandler, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import styled from 'styled-components';
@@ -17,7 +17,7 @@ import { Conversation, IMessage } from './../types/index';
 import {
   convertFirestoreTimestampToString,
   generatorQueryGetMessages,
-  transformMessage
+  transformMessage,
 } from './../utils/getMessagesInConversation';
 import Message from './Message';
 import RecipientAvatar from './RecipientAvatar';
@@ -83,7 +83,7 @@ const StyledInput = styled.input`
 
 const EndOfMessagesForAutoScroll = styled.div`
   margin-bottom: 30px;
-`
+`;
 
 const ConversationScreen = ({
   conversation,
@@ -137,10 +137,13 @@ const ConversationScreen = ({
     if (!newMessage) return;
     addMessageToDbAndUpdateLastSeen();
   };
-  const endOfMessageRef = useRef<HTMLDivElement>(null)
+  const endOfMessageRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = () => {
     endOfMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }
+  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messagesSnapshot]);
   return (
     <>
       <StyledRecipientHeader>
@@ -164,7 +167,7 @@ const ConversationScreen = ({
 
       <StyledMessageContainer>{showMessages()}</StyledMessageContainer>
 
-      <EndOfMessagesForAutoScroll ref={endOfMessageRef}/>
+      <EndOfMessagesForAutoScroll ref={endOfMessageRef} />
 
       <StyledInputContainer>
         <InsertEmoticonIcon />
